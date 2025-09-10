@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Realtime Chat Test</title>
+</head>
+<body>
+  <h1>Realtime Chat</h1>
+
+  <label>Refresh Token: <input id="refresh" size="80"></label><br><br>
+  <label>Room ID: <input id="room" value="1"></label><br><br>
+  <button onclick="connect()">Connect</button>
+
+  <h2>Messages</h2>
+  <div id="log" style="border:1px solid #ccc; height:200px; overflow:auto; padding:5px;"></div>
+
+  <input id="msg" size="60" placeholder="Type a message...">
+<button type="button" onclick="sendMsg()">Send</button>
+
+<script>
+  document.getElementById("msg").addEventListener("keypress", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendMsg();
+    }
+  });
+</script>
+
+  <script>
+    let ws;
+    let accessToken = null;
+    let refreshToken = null;
+
+    function log(msg) {
+      const div = document.getElementById("log");
+      div.innerHTML += msg + "<br>";
+      div.scrollTop = div.scrollHeight;
+    }
+
+    function connect() {
+      refreshToken = document.getElementById("refresh").value;
+      const roomId = document.getElementById("room").value;
+
+      ws = new WebSocket(`ws://127.0.0.1:8001/ws/chat/${roomId}?refresh=${refreshToken}`);
+
+      ws.onopen = () => log("✅ Connected");
+      ws.onclose = () => log("❌ Disconnected");
+
+      ws.onmessage = (ev) => {
+        const data = JSON.parse(ev.data);
+        console.log("recv", data);
+
+        if (data.type === "token.refresh") {
+          accessToken = data.access;
+          log("🔑 Got new access token");
+        } else if (data.type === "message") {
+          log(`<b>${data.message.sender}:</b> ${data.message.content}`);
+        } else if (data.type === "users.online") {
+          log(`👥 Online: ${data.users.join(", ")}`);
+        } else if (data.type === "user.join") {
+          log(`➡️ ${data.user} joined`);
+        } else if (data.type === "user.leave") {
+          log(`⬅️ ${data.user} left`);
+        } else {
+          log(JSON.stringify(data));
+        }
+      };
+    }
+
+    function sendMsg() {
+      const text = document.getElementById("msg").value;
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "message", content: text }));
+        document.getElementById("msg").value = "";
+      }
+    }
+  </script>
+</body>
+</html>
