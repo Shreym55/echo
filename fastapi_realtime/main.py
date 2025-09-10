@@ -36,6 +36,7 @@ class ConnectionManager:
         self.active_connections: Dict[int, List[Tuple[int, str, WebSocket]]] = {}
 
     async def connect(self, websocket: WebSocket, room_id: int, user_id: int, username: str):
+        
         # await websocket.accept()
         conns = self.active_connections.setdefault(room_id, [])
         conns.append((user_id, username, websocket))

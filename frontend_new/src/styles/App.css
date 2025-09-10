@@ -87,6 +87,7 @@ body {
   margin: 0 0 1rem;
   border-bottom: 1px solid #ddd;
   padding-bottom: 0.5rem;
+  position: sticky;
 }
 .msg {
   margin-bottom: 10px;
@@ -164,28 +165,133 @@ body {
   margin-top: 10px;
 }
 
-/* 
+
+
+
+/* ===== Modal Overlay ===== */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.4); /* semi-transparent dark overlay */
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
+/* ===== Modal Box ===== */
 .modal {
   background: var(--white);
   padding: 1.5rem;
   border-radius: 8px;
-  width: 300px;
+  width: 350px;
+  max-width: 90%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.2s ease-in-out;
 }
 
+.modal h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  color: var(--primary-dark);
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+/* ===== Inputs ===== */
+.modal input,
+.modal select {
+  width: 100%;
+  padding: 8px;
+  margin: 0.5rem 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* ===== User list checkboxes ===== */
 .user-list {
   max-height: 150px;
   overflow-y: auto;
-  margin: 1rem 0;
-} */
+  margin: 0.5rem 0;
+  border: 1px solid #eee;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background: var(--bg);
+}
+
+.user-checkbox {
+  display: block;
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+
+/* ===== Buttons ===== */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.modal-actions button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.modal-actions button:first-child {
+  background: var(--primary);
+  color: var(--white);
+}
+
+.modal-actions button:last-child {
+  background: #eee;
+  color: #333;
+}
+
+/* ===== Fade-in animation ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+/* ===== Chat Header ===== */
+.chat-header {
+  position: sticky;          /* 👈 stays visible when scrolling */
+  top: 0;
+  z-index: 10;
+  background: var(--primary-light);
+  padding: 12px 16px;
+  border-bottom: 1px solid #ccc;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-header h3 {
+  margin: 0;
+  font-style: bold;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+.sender-title{
+  font-size: .8rem;
+
+}

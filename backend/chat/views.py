@@ -58,6 +58,8 @@ class PrivateRoomView(generics.GenericAPIView):
             created_by=user1,
             room_type="private",
             name=f"private_{user1.username}_{user2.username}"
+            # name=f"{user2.username}"
+
         )
         room.participants.add(user1, user2) 
         

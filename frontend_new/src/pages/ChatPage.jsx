@@ -1,9 +1,12 @@
+// 
+
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import Navbar from "../components/Layout/Navbar";
 import RoomList from "../components/Layout/RoomList";
 import ChatWindow from "../components/Chat/ChatWindow";
 import MessageInput from "../components/Chat/MessageInput";
+import NewRoomModal from "../components/Modals/NewRoomModal";
 
 export default function ChatPage() {
   const { user, access, logout } = useContext(AuthContext);
@@ -11,7 +14,9 @@ export default function ChatPage() {
   const [currentRoom, setCurrentRoom] = useState(null);
   const [messages, setMessages] = useState([]);
   const [ws, setWs] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
+  // Fetch existing rooms
   useEffect(() => {
     fetch("/rooms/", { headers: { Authorization: `Bearer ${access}` } })
       .then((res) => res.json())
@@ -30,7 +35,8 @@ export default function ChatPage() {
     socket.onmessage = (ev) => {
       const data = JSON.parse(ev.data);
       if (data.type === "history") setMessages(data.messages);
-      if (data.type === "message") setMessages((prev) => [...prev, data.message]);
+      if (data.type === "message")
+        setMessages((prev) => [...prev, data.message]);
     };
 
     setWs(socket);
@@ -44,16 +50,25 @@ export default function ChatPage() {
 
   return (
     <div className="chat-layout">
-      <Navbar onLogout={logout} />
+      {/* Pass setShowModal to Navbar */}
+      <Navbar onAddRoom={() => setShowModal(true)} onLogout={logout} />
+
       <div className="main-content">
         <RoomList
           rooms={rooms}
           currentRoom={currentRoom}
           onSelectRoom={connectRoom}
         />
+
         <main className="chat-main">
+         
           {currentRoom ? (
             <>
+            <div className="chat-header">
+             {currentRoom.room_type === "private"
+              ? currentRoom.participants.find((p) => p.id !== user.id)?.username || "Private"
+              : currentRoom.name}
+      </div>
               <ChatWindow messages={messages} user={user} room={currentRoom} />
               <MessageInput onSend={sendMsg} />
             </>
@@ -61,7 +76,16 @@ export default function ChatPage() {
             <div className="empty">Select a room</div>
           )}
         </main>
+        
       </div>
+
+      {/* Show modal when "New Room" clicked */}
+      {showModal && (
+        <NewRoomModal
+          onClose={() => setShowModal(false)}
+          onRoomCreated={(room) => setRooms((prev) => [...prev, room])}
+        />
+      )}
     </div>
   );
 }

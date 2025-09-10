@@ -2,8 +2,15 @@ from rest_framework import serializers
 from .models import Room, Message
 from django.contrib.auth.models import User
 
+
+class UserSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username"]
+
 class RoomSerializer(serializers.ModelSerializer):
-    participants = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
+    # participants = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
+    participants = UserSimpleSerializer(many=True, read_only=True)
 
     class Meta:
         model = Room
