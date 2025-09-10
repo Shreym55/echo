@@ -15,6 +15,17 @@ class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
         fields = ["id", "name", "room_type", "participants"]
+    
+    def get_last_message(self, obj):
+        last_msg = obj.message_set.order_by("-created_at").first()
+        if last_msg:
+            return {
+                "id": last_msg.id,
+                "sender": last_msg.sender.username,
+                "content": last_msg.content,
+                "created_at": last_msg.created_at,
+            }
+        return None
 
 class MessageSerializer(serializers.ModelSerializer):
     sender = serializers.ReadOnlyField(source="sender.username")
